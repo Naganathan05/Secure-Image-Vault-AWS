@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_role" {
-  name = "lambda role"
+  name = "lambda_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "dynamodb_access" {
       "dynamodb:UpdateItem"
     ]
     resources = [
-      aws_dynamodb_table.visitor_count.arn
+      var.dynamodb_table_arn
     ]
   }
 }
@@ -36,11 +36,11 @@ resource "aws_iam_role_policy_attachment" "dynamodb_access" {
 }
 
 resource "aws_lambda_function" "count" {
-  filename      = "Count.zip"
-  function_name = "count"
-  handler       = "count.lambda_handler"
+  filename      = "./Count.zip"
+  function_name = "Count"
+  handler       = "Count.handler"
   role          = aws_iam_role.lambda_role.arn
-  runtime       = "nodejs14.x"
+  runtime       = "nodejs20.x"
 }
 
 resource "aws_lambda_permission" "lambda_permission" {
@@ -49,5 +49,5 @@ resource "aws_lambda_permission" "lambda_permission" {
   function_name = aws_lambda_function.count.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_api_gateway_rest_api.rest_api.execution_arn}/*"
+  source_arn = "${var.api_gateway_execution_arn}/*"
 }

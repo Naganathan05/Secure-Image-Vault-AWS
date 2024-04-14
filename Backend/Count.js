@@ -49,6 +49,7 @@ exports.handler = async (event) => {
             }).promise();
 
             const count = response.Item.count;
+            console.log("This Is Count: ", count)
 
             return {
                 statusCode: 200,
